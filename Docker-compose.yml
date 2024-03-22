@@ -1,6 +1,29 @@
-version: '3'
+version: '3.8'
+
 services:
-  web:
-    build: .
+  db:
+    image: mysql:latest
+    container_name: rac-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: z4KdNnDqFj2WChUPvk93LE
+      MYSQL_DATABASE: registro
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
+
+  python_app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
